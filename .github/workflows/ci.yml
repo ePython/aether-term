@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-and-build:
+    name: Quality gates + PyInstaller build (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout (full history for hatch-vcs)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Pin Python 3.12
+        run: uv python install 3.12
+
+      - name: Sync (dev group, locked)
+        run: uv sync --frozen
+
+      - name: Lint (Ruff)
+        run: uv run poe lint
+
+      - name: Format check (Ruff)
+        run: uv run poe format-check
+
+      - name: Markdown check (mdformat)
+        run: uv run poe md-check
+
+      - name: Type check (Mypy strict)
+        run: uv run poe typecheck
+
+      - name: Tests with coverage
+        run: uv run poe cov
+
+      - name: Build single-file GUI executable
+        run: uv run poe build-exe
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aetherterm-windows
+          path: dist/aetherterm.exe
+          if-no-files-found: error

@@ -1,0 +1,38 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Build / distribution
+build/
+dist/
+*.manifest
+
+# hatch-vcs generated version file
+src/aetherterm/_version.py
+
+# PyInstaller — ignore all specs EXCEPT the checked-in one
+*.spec
+!aetherterm.spec
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Type / lint caches
+.mypy_cache/
+.ruff_cache/
+
+# Environments (note: uv.lock IS committed — this is an application)
+.venv/
+venv/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

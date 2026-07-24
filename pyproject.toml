@@ -1,0 +1,181 @@
+[build-system]
+requires = ["hatchling>=1.27", "hatch-vcs>=0.4"]
+build-backend = "hatchling.build"
+
+# --------------------------------------------------------------------------- #
+# Project metadata                                                            #
+# --------------------------------------------------------------------------- #
+[project]
+name = "aetherterm"
+description = "Cross-platform serial / socket / telnet / SSH terminal with a configurable automation button grid."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Aetherterm Authors" }]
+keywords = ["terminal", "serial", "ssh", "telnet", "socket", "automation", "gui", "tkinter"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: X11 Applications",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Terminals :: Serial",
+    "Topic :: System :: Networking",
+    "Typing :: Typed",
+]
+# Version is derived from Git tags by hatch-vcs.
+dynamic = ["version"]
+# Tkinter ships with CPython — no runtime dependencies yet.
+dependencies = []
+
+[project.urls]
+Homepage = "https://example.com/aetherterm"
+Repository = "https://example.com/aetherterm"
+Issues = "https://example.com/aetherterm/issues"
+
+# GUI launch surface: installed script AND frozen exe both call aetherterm.gui:main.
+[project.gui-scripts]
+aetherterm = "aetherterm.gui:main"
+
+# Developer tooling (PEP 735). `uv sync` installs this group by default.
+[dependency-groups]
+dev = [
+    "ruff>=0.6.9",
+    "mypy>=1.11",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "mdformat>=0.7.17",
+    "mdformat-gfm>=0.3.6",
+    "pyinstaller>=6.10",
+    "poethepoet>=0.29",
+    "pre-commit>=3.8",
+]
+
+# --------------------------------------------------------------------------- #
+# Hatchling build + dynamic versioning (hatch-vcs)                            #
+# --------------------------------------------------------------------------- #
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+# Generated at build time; imported at runtime; git-ignored.
+version-file = "src/aetherterm/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aetherterm"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "docs", "architecture", "README.md", "LICENSE", "CLAUDE.md"]
+
+# --------------------------------------------------------------------------- #
+# Task runner (poethepoet):  uv run poe <task>                                #
+# --------------------------------------------------------------------------- #
+[tool.poe.tasks]
+lint         = { cmd = "ruff check .",                                       help = "Lint with Ruff" }
+format       = { cmd = "ruff format .",                                      help = "Auto-format with Ruff" }
+format-check = { cmd = "ruff format --check .",                              help = "Verify formatting" }
+typecheck    = { cmd = "mypy",                                               help = "Strict type-check (src + tests)" }
+test         = { cmd = "pytest",                                             help = "Run the test suite" }
+cov          = { cmd = "pytest --cov=aetherterm --cov-report=term-missing --cov-report=xml", help = "Tests with coverage" }
+md           = { cmd = "mdformat --number --end-of-line lf README.md CLAUDE.md docs architecture",           help = "Format Markdown" }
+md-check     = { cmd = "mdformat --number --end-of-line lf --check README.md CLAUDE.md docs architecture",   help = "Verify Markdown formatting" }
+build-exe    = { cmd = "pyinstaller aetherterm.spec --noconfirm --clean",   help = "Build single-file GUI executable" }
+
+[tool.poe.tasks.check]
+help = "Run all quality gates (lint, format, markdown, types, coverage)"
+sequence = [
+    { ref = "lint" },
+    { ref = "format-check" },
+    { ref = "md-check" },
+    { ref = "typecheck" },
+    { ref = "cov" },
+]
+
+# --------------------------------------------------------------------------- #
+# Ruff (lint + format)                                                        #
+# --------------------------------------------------------------------------- #
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = ["src/aetherterm/_version.py"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle + pyflakes
+    "I",             # isort
+    "N",             # pep8-naming
+    "UP",            # pyupgrade
+    "B",             # flake8-bugbear
+    "A",             # flake8-builtins
+    "C4",            # comprehensions
+    "SIM",           # flake8-simplify
+    "TCH",           # type-checking imports
+    "PTH",           # use pathlib
+    "RUF",           # Ruff-specific
+]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # assert is fine in tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["aetherterm"]
+
+[tool.ruff.format]
+quote-style = "double"
+line-ending = "lf"
+
+# --------------------------------------------------------------------------- #
+# Mypy (strict)                                                               #
+# --------------------------------------------------------------------------- #
+[tool.mypy]
+python_version = "3.12"
+files = ["src", "tests"]
+mypy_path = "src"
+strict = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+no_implicit_reexport = true
+show_error_codes = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = "aetherterm._version"
+ignore_errors = true  # generated file
+
+# --------------------------------------------------------------------------- #
+# Pytest + coverage                                                           #
+# --------------------------------------------------------------------------- #
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --strict-markers --strict-config --import-mode=importlib"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["aetherterm"]
+branch = true
+omit = ["src/aetherterm/_version.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+# --------------------------------------------------------------------------- #
+# mdformat                                                                     #
+# --------------------------------------------------------------------------- #
+# NOTE: mdformat has no pyproject.toml support — it only reads a dedicated
+# `.mdformat.toml` file, which this project deliberately does not add (all
+# config is meant to live in pyproject.toml). Its options are therefore passed
+# as explicit CLI flags on the `md` / `md-check` tasks below instead of in a
+# `[tool.mdformat]` table, which mdformat would silently ignore.
