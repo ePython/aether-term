@@ -1,0 +1,14 @@
+aetherterm
+Copyright (c) 2026 Aetherterm Authors
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full license text.
+
+===============================================================================
+THIRD-PARTY COMPONENTS
+===============================================================================
+
+This software uses Python standard library components (tkinter, among
+others) and third-party packages listed in pyproject.toml, each under its
+own license. Run `uv run pip list --format=columns` to see installed
+packages.

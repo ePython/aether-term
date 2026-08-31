@@ -72,18 +72,19 @@ This project uses [poethepoet](https://poethepoet.natn.io/), configured
 entirely under `[tool.poe.tasks]` in `pyproject.toml`. Every task is invoked
 as `uv run poe <task>`:
 
-| Task           | Command it runs                                                         | Purpose                                 |
-| -------------- | ----------------------------------------------------------------------- | --------------------------------------- |
-| `lint`         | `ruff check .`                                                          | Lint                                    |
-| `format`       | `ruff format .`                                                         | Auto-format (writes)                    |
-| `format-check` | `ruff format --check .`                                                 | Verify formatting (no writes)           |
-| `typecheck`    | `mypy`                                                                  | Strict type-check of `src` + `tests`    |
-| `test`         | `pytest`                                                                | Run the test suite                      |
-| `cov`          | `pytest --cov=aetherterm ...`                                           | Tests with terminal + XML coverage      |
-| `md`           | `mdformat .`                                                            | Format Markdown (writes)                |
-| `md-check`     | `mdformat --check .`                                                    | Verify Markdown formatting (no writes)  |
-| `build-exe`    | `pyinstaller aetherterm.spec --noconfirm --clean`                       | Build the single-file GUI executable    |
-| `check`        | runs `lint`, `format-check`, `md-check`, `typecheck`, `cov` in sequence | The full local quality gate, mirrors CI |
+| Task           | Command it runs                                                                  | Purpose                                 |
+| -------------- | -------------------------------------------------------------------------------- | --------------------------------------- |
+| `lint`         | `ruff check .`                                                                   | Lint                                    |
+| `format`       | `ruff format .`                                                                  | Auto-format (writes)                    |
+| `format-check` | `ruff format --check .`                                                          | Verify formatting (no writes)           |
+| `typecheck`    | `mypy`                                                                           | Strict type-check of `src` + `tests`    |
+| `test`         | `pytest`                                                                         | Run the test suite                      |
+| `cov`          | `pytest --cov=aetherterm ...`                                                    | Tests with terminal + XML coverage      |
+| `md`           | `mdformat .`                                                                     | Format Markdown (writes)                |
+| `md-check`     | `mdformat --check .`                                                             | Verify Markdown formatting (no writes)  |
+| `audit`        | `pip-audit`                                                                      | Check dependencies for known CVEs       |
+| `build-exe`    | `pyinstaller aetherterm.spec --noconfirm --clean`                                | Build the single-file GUI executable    |
+| `check`        | runs `lint`, `format-check`, `md-check`, `typecheck`, `cov`, `audit` in sequence | The full local quality gate, mirrors CI |
 
 When adding a new dev task, add it to `[tool.poe.tasks]` in `pyproject.toml`
 — do not introduce a separate Makefile, npm-style script runner, or shell
@@ -97,7 +98,11 @@ script for anything that fits this pattern.
   is exempted (generated code) via `[[tool.mypy.overrides]]`.
 - **Pytest + pytest-cov** — config under `[tool.pytest.ini_options]` /
   `[tool.coverage.run]` / `[tool.coverage.report]`. Tests live in `tests/`.
+  Coverage must stay at or above 70% (`--cov-fail-under=70` on the `cov`
+  task).
 - **mdformat** — Markdown formatting, config under `[tool.mdformat]`.
+- **pip-audit** — dependency vulnerability scanning against the locked
+  environment (`poe audit`). No dedicated config; it reads the active venv.
 
 Run everything at once with `uv run poe check` before opening a PR — this is
 exactly what CI runs (see below).
@@ -105,6 +110,7 @@ exactly what CI runs (see below).
 ## Pre-commit
 
 `.pre-commit-config.yaml` wires up `pre-commit-hooks` (basic hygiene),
+`gitleaks` (secret scanning — suppressions in `.gitleaks.toml`),
 `ruff-pre-commit` (lint + format), `mirrors-mypy` (strict type-check), and
 `mdformat`. Install once per clone with `uv run pre-commit install`; hooks
 then run automatically on `git commit`. To run them ad hoc across the whole
@@ -190,7 +196,7 @@ uv run python -c "import aetherterm; print(aetherterm.__version__)"
 `.github/workflows/ci.yml` runs on `windows-latest` only (Linux CI is future
 work, not yet wired). It uses `astral-sh/setup-uv` with caching keyed off
 `uv.lock`, checks out full history (`fetch-depth: 0`, required for `hatch-vcs`
-to see tags), then runs, in order: `uv sync --frozen`, `poe lint`, `poe format-check`, `poe md-check`, `poe typecheck`, `poe cov`, `poe build-exe`,
+to see tags), then runs, in order: `uv sync --frozen`, `poe lint`, `poe format-check`, `poe md-check`, `poe typecheck`, `poe cov`, `poe audit`, `poe build-exe`,
 and finally uploads `dist/aetherterm.exe` as a workflow artifact. Keep local
 `uv run poe check` + `uv run poe build-exe` green before pushing — that's the
 same sequence CI enforces.

@@ -1,0 +1,32 @@
+# Enforce Unix line endings in the repo; let tools decide on checkout.
+* text=auto eol=lf
+
+# Python source — always LF
+*.py  text eol=lf
+*.pyi text eol=lf
+
+# Configuration / markup
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.cfg  text eol=lf
+*.ini  text eol=lf
+*.txt  text eol=lf
+*.sh   text eol=lf
+
+# Windows batch files — must keep CRLF on checkout so cmd.exe can execute them
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets — do not mangle
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.exe  binary
+*.dll  binary
+*.zip  binary
+*.whl  binary

@@ -55,6 +55,7 @@ dev = [
     "pyinstaller>=6.10",
     "poethepoet>=0.29",
     "pre-commit>=3.8",
+    "pip-audit>=2.7",
 ]
 
 # --------------------------------------------------------------------------- #
@@ -82,19 +83,21 @@ format       = { cmd = "ruff format .",                                      hel
 format-check = { cmd = "ruff format --check .",                              help = "Verify formatting" }
 typecheck    = { cmd = "mypy",                                               help = "Strict type-check (src + tests)" }
 test         = { cmd = "pytest",                                             help = "Run the test suite" }
-cov          = { cmd = "pytest --cov=aetherterm --cov-report=term-missing --cov-report=xml", help = "Tests with coverage" }
-md           = { cmd = "mdformat --number --end-of-line lf README.md CLAUDE.md docs architecture",           help = "Format Markdown" }
-md-check     = { cmd = "mdformat --number --end-of-line lf --check README.md CLAUDE.md docs architecture",   help = "Verify Markdown formatting" }
+cov          = { cmd = "pytest --cov=aetherterm --cov-report=term-missing --cov-report=xml --cov-fail-under=70", help = "Tests with coverage (fails under 70%)" }
+audit        = { cmd = "pip-audit",                                          help = "Check dependencies for known vulnerabilities" }
+md           = { cmd = "mdformat --number --end-of-line lf README.md CLAUDE.md CHANGELOG.md CONTRIBUTING.md SECURITY.md docs architecture",         help = "Format Markdown" }
+md-check     = { cmd = "mdformat --number --end-of-line lf --check README.md CLAUDE.md CHANGELOG.md CONTRIBUTING.md SECURITY.md docs architecture", help = "Verify Markdown formatting" }
 build-exe    = { cmd = "pyinstaller aetherterm.spec --noconfirm --clean",   help = "Build single-file GUI executable" }
 
 [tool.poe.tasks.check]
-help = "Run all quality gates (lint, format, markdown, types, coverage)"
+help = "Run all quality gates (lint, format, markdown, types, coverage, audit)"
 sequence = [
     { ref = "lint" },
     { ref = "format-check" },
     { ref = "md-check" },
     { ref = "typecheck" },
     { ref = "cov" },
+    { ref = "audit" },
 ]
 
 # --------------------------------------------------------------------------- #
@@ -119,11 +122,19 @@ select = [
     "TCH",           # type-checking imports
     "PTH",           # use pathlib
     "RUF",           # Ruff-specific
+    "D",             # pydocstyle
 ]
-ignore = []
+ignore = [
+    "D203",  # one-blank-line-before-class (conflicts with D211)
+    "D213",  # multi-line-summary-second-line (conflicts with D212)
+]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]  # assert is fine in tests
+"tests/**" = ["S101", "D"]  # assert is fine in tests; tests don't need docstrings
+"scripts/**" = ["D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
 [tool.ruff.lint.isort]
 known-first-party = ["aetherterm"]
@@ -170,6 +181,12 @@ omit = ["src/aetherterm/_version.py"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
 
 # --------------------------------------------------------------------------- #
 # mdformat                                                                     #

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv sync:*)",
+      "Bash(uv run poe *)",
+      "Bash(uv run pytest*)",
+      "Bash(uv run ruff*)",
+      "Bash(uv run mypy*)",
+      "Bash(uv run mdformat*)",
+      "Bash(uv run pre-commit*)",
+      "Bash(uv run pip-audit*)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(git tag*)",
+      "Bash(git show*)",
+      "Bash(git stash list*)"
+    ]
+  }
+}

@@ -36,3 +36,6 @@ venv/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Claude Code — local/personal overrides, not shared team config
+.claude/settings.local.json

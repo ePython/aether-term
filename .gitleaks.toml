@@ -1,0 +1,15 @@
+# .gitleaks.toml — Gitleaks configuration
+# Docs: https://github.com/gitleaks/gitleaks#configuration
+#
+# To suppress a false positive:
+#   - Per-line:  add a `gitleaks:allow` comment on the offending line
+#   - Per-regex: add a regex to [allowlist].regexes below
+#   - Per-path:  add a glob to [allowlist].paths below
+title = "aetherterm gitleaks config"
+
+[allowlist]
+description = "Known non-secret patterns to suppress"
+regexes = [
+    '''you@example\.com''',
+    '''security@example\.com''',
+]

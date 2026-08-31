@@ -48,6 +48,9 @@ jobs:
       - name: Tests with coverage
         run: uv run poe cov
 
+      - name: Dependency audit (pip-audit)
+        run: uv run poe audit
+
       - name: Build single-file GUI executable
         run: uv run poe build-exe
 
