@@ -52,10 +52,16 @@ dev = [
     "pytest-cov>=5.0",
     "mdformat>=0.7.17",
     "mdformat-gfm>=0.3.6",
+    "mdformat-frontmatter>=2.0.8",
     "pyinstaller>=6.10",
     "poethepoet>=0.29",
     "pre-commit>=3.8",
     "pip-audit>=2.7",
+]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.6.0",
+    "mkdocstrings[python]>=0.29.0",
 ]
 
 # --------------------------------------------------------------------------- #
@@ -72,7 +78,7 @@ version-file = "src/aetherterm/_version.py"
 packages = ["src/aetherterm"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src", "tests", "docs", "architecture", "README.md", "LICENSE", "CLAUDE.md"]
+include = ["src", "tests", "docs", "README.md", "LICENSE", "CLAUDE.md"]
 
 # --------------------------------------------------------------------------- #
 # Task runner (poethepoet):  uv run poe <task>                                #
@@ -85,9 +91,10 @@ typecheck    = { cmd = "mypy",                                               hel
 test         = { cmd = "pytest",                                             help = "Run the test suite" }
 cov          = { cmd = "pytest --cov=aetherterm --cov-report=term-missing --cov-report=xml --cov-fail-under=70", help = "Tests with coverage (fails under 70%)" }
 audit        = { cmd = "pip-audit",                                          help = "Check dependencies for known vulnerabilities" }
-md           = { cmd = "mdformat --number --end-of-line lf README.md CLAUDE.md CHANGELOG.md CONTRIBUTING.md SECURITY.md docs architecture",         help = "Format Markdown" }
-md-check     = { cmd = "mdformat --number --end-of-line lf --check README.md CLAUDE.md CHANGELOG.md CONTRIBUTING.md SECURITY.md docs architecture", help = "Verify Markdown formatting" }
+md           = { cmd = "mdformat --number --end-of-line lf README.md CLAUDE.md CHANGELOG.md CONTRIBUTING.md SECURITY.md docs",         help = "Format Markdown" }
+md-check     = { cmd = "mdformat --number --end-of-line lf --check README.md CLAUDE.md CHANGELOG.md CONTRIBUTING.md SECURITY.md docs", help = "Verify Markdown formatting" }
 build-exe    = { cmd = "pyinstaller aetherterm.spec --noconfirm --clean",   help = "Build single-file GUI executable" }
+docs         = { cmd = "mkdocs build",                                      help = "Build the documentation site (requires: uv sync --group docs)" }
 
 [tool.poe.tasks.check]
 help = "Run all quality gates (lint, format, markdown, types, coverage, audit)"

@@ -9,6 +9,9 @@ build/
 dist/
 *.manifest
 
+# MkDocs build output
+site/
+
 # hatch-vcs generated version file
 src/aetherterm/_version.py
 
