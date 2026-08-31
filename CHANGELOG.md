@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial scaffold: `uv`/Hatchling packaging, PyInstaller build pipeline,
   Ruff/mypy/pytest quality gates, and the `aetherterm.gui:main` GUI entry
   point stub.
+- MkDocs documentation site (`mkdocs.yml`, `docs/api/aetherterm.md` via
+  mkdocstrings) plus the ADR and design-brief scaffolding under
+  `docs/architecture/` and a placeholder SRS under `docs/srs/`.
+- Four project-specific Claude Code skills under `.claude/skills/`:
+  `/kickoff`, `/docs-sync`, `/release`, and `/ship`, with matching
+  `.claude/settings.json` permissions for the git/GitHub commands they run.
 
 <!--
 Once this repo has a real remote, add comparison links here, e.g.:

@@ -1,0 +1,78 @@
+site_name: aetherterm
+site_description: >-
+  Cross-platform serial / socket / telnet / SSH terminal with a configurable
+  automation button grid.
+site_url: https://ePython.github.io/aether-term/
+repo_url: https://github.com/ePython/aether-term
+repo_name: ePython/aether-term
+copyright: Copyright &copy; 2026 Aetherterm Authors
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: true
+            docstring_style: numpy
+            show_root_heading: true
+            show_if_no_docstring: false
+
+# template.md is built as a page (useful as a reference) but not linked in nav.
+not_in_nav: |
+  architecture/adr/template.md
+
+# Briefs are internal working contracts, not published documentation — keep
+# them out of the built site entirely (see architecture/briefs/README.md).
+exclude_docs: |
+  architecture/briefs/
+
+nav:
+  - Home: index.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - ADRs: architecture/adr/README.md
+  - SRS: srs/software-requirements-specification.md
+  - API Reference: api/aetherterm.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
