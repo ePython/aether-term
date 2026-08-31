@@ -115,7 +115,7 @@ as `uv run poe <task>`:
 | `check`        | runs `lint`, `format-check`, `md-check`, `typecheck`, `cov`, `audit` in sequence | The full local quality gate, mirrors CI                     |
 
 `docs` is intentionally not part of `check`/CI yet — it lives in its own
-`docs` dependency group (not installed by default). Wire it into CI once 
+`docs` dependency group (not installed by default). Wire it into CI once
 there's real doc content worth protecting from bit-rot.
 
 When adding a new dev task, add it to `[tool.poe.tasks]` in `pyproject.toml`
